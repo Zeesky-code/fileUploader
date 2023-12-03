@@ -3,6 +3,7 @@ import com.kanunum.fileuploader.MinioAdapter;
 import io.minio.messages.Bucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +24,9 @@ public class MinioStorageController{
         return minioAdapter.getAllBuckets();
     }
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public Map<String, String> uploadFile(@RequestPart(value = "file", required = false) MultipartFile files) throws IOException {
+    public @ResponseBody ResponseEntity<String> uploadFile(@RequestPart(value = "file", required = false) MultipartFile files) throws IOException {
         minioAdapter.uploadFile(files.getOriginalFilename(), files.getBytes());
-        Map<String, String> result = new HashMap<>();
-        result.put("key", files.getOriginalFilename());
-        return result;
+        return new ResponseEntity<>("File uploaded successfully!", HttpStatus.OK);
     }
 
     @GetMapping(path = "/download")
